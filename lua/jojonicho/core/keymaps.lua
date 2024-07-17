@@ -21,3 +21,21 @@ keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" 
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
+
+-- commenting
+do
+	local operator_rhs = function()
+		return require("vim._comment").operator()
+	end
+	vim.keymap.set({ "n", "x" }, "<C-_>", operator_rhs, { expr = true, desc = "Toggle comment" })
+
+	local line_rhs = function()
+		return require("vim._comment").operator() .. "_"
+	end
+	vim.keymap.set("n", "<C-_>", line_rhs, { expr = true, desc = "Toggle comment line" })
+
+	local textobject_rhs = function()
+		require("vim._comment").textobject()
+	end
+	vim.keymap.set({ "o" }, "<C-_>", textobject_rhs, { desc = "Comment textobject" })
+end
