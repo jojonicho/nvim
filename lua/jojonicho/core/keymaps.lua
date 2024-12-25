@@ -22,6 +22,7 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- 6
 -- commenting
 do
 	local operator_rhs = function()
@@ -39,3 +40,52 @@ do
 	end
 	vim.keymap.set({ "o" }, "<C-_>", textobject_rhs, { desc = "Comment textobject" })
 end
+
+-- compiling stuff (competitive programming)
+-- Set the path for the AtCoder library
+local acl_path = "~/Desktop/cppstuff/atcoder/ac-library"
+
+-- Function to create a custom mapping for specific file types
+local function map_filetype(filetype, command)
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = filetype,
+		callback = function()
+			vim.api.nvim_buf_set_keymap(0, "n", "<C-s>", command, { noremap = true, silent = true })
+		end,
+	})
+end
+
+-- C++ mapping
+map_filetype(
+	"cpp",
+	":w<CR>:vsplit<CR>:terminal g++-12 %:r.cpp -std=c++17 -I "
+		.. acl_path
+		.. " -Wshift-overflow=2 -g -o %:r -D LOCAL && ./%:r<CR>i"
+)
+
+-- Python mapping
+map_filetype("python", ":w<CR>:vsplit<CR>:terminal python3 %:r.py<CR>i")
+
+-- Go mapping
+map_filetype("go", ":w<CR>:vsplit<CR>:terminal go run %:r.go<CR>i")
+
+-- Rust mapping
+map_filetype("rust", ":w<CR>:vsplit<CR>:terminal cargo run %:r.rs<CR>i")
+
+-- Java mapping
+map_filetype("java", ":w<CR>:vsplit<CR>:terminal javac %:r.java && java %:r<CR>i")
+
+-- TODO: migrate these
+-- autocmd BufNewFile *.cpp 0r ~/Desktop/cppstuff/codeforces/template/a.cpp | 80
+-- autocmd BufNewFile,BufRead *.cpp setlocal foldmethod=marker | set foldopen-=hor | set foldopen-=block
+
+-- Autocommands
+vim.api.nvim_create_autocmd("BufNewFile", {
+	pattern = "*.cpp",
+	command = "0r ~/Desktop/cppstuff/codeforces/template/a.cpp | 80",
+})
+
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+	pattern = "*.cpp",
+	command = "setlocal foldmethod=marker | set foldopen-=hor | set foldopen-=block",
+})
